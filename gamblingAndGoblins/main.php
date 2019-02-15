@@ -25,7 +25,7 @@
             $this->health = $health;
         }
         function setMoney($dif){
-            $this->money += $dif;
+            $this->money = $this->money + $dif;
         }
     }
 
@@ -46,37 +46,33 @@
     //Gambler's table
     echo "<h4>Gamblers Table</h4>";
     class Table {
-        public $bet;
-        function setBet($amount){
-            if ($amount) {
-            $this->bet = $amount;
-            } else echo "Please bet at least 1 gold";
-        }
-        function play($gameType){
+        public $wins;
+        public $loses;
+        function play($gameType, $amount){
             switch($gameType) {
                 case "low":
                     $gen = rand(1,10);
                     if ($gen > 3) {
-                        return $this->bet;
+                        return $amount * 1.28;
                     } else {
-                        // return -$this->bet;
-                        return "lose";
+                        // return -$amount;
+                        return -$amount;
                     }
                     break;
                 case "med":
                     $gen = rand(1,10);
                     if ($gen > 5) {
-                        return $this->bet * 1.95;
+                        return $amount * 1.95;
                     } else {
-                        return -$this->bet;
+                        return -$amount;
                     }
                     break;
                 case "high":
                 $gen = rand(1,10);
                     if ($gen > 7) {
-                        return $this->bet * 2.35;
+                        return $amount * 2.35;
                     } else {
-                        return -$this->bet;
+                        return -$amount;
                     }
                     break;
             }
@@ -90,19 +86,7 @@
     //display
     ?>
     <form action="main.php" method="post">
-        Place Bet On Table: <input type="number" name="currentBet">
-        <input type="submit">
-    </form>
-
-
-    <?php
-    $currentBet = $_POST["currentBet"];
-    if ($currentBet){
-        echo "You've placed $currentBet gold on the table <br>";
-    }
-    $newTable->setBet($currentBet);
-    ?>
-    <form action="main.php" method="post">
+    Place Bet On Table: <input type="number" name="currentBet"> <br>
         <br>Choose your risk: <br>
         Low (70/30): <input type="radio" name="gamble" value="low"> <br>
         Med (50/50): <input type="radio" name="gamble" value="med"> <br>
@@ -111,8 +95,17 @@
     </form><br>
     <?php
     $gameType = $_POST["gamble"];
-    $dif = $newTable->play($gameType);
-    echo "$dif";
+    $currentBet = $_POST["currentBet"];
+    if ($currentBet == 0) {
+        echo "Please bet at least 1 gold.";
+    } else if ($currentBet > $newPlayer->money) {
+        echo "You don't have that much money!";
+    } else {
+        $dif = $newTable->play($gameType, $currentBet);
+        $newPlayer->setMoney(5);
+        //issue here
+    }
+    echo "Reward: $dif";
     echo "<h4>Merchant's Shop</h4>";
     echo "<h4>Wilderness</h4>";
     //playerAttributes
